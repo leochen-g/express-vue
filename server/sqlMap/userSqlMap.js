@@ -3,8 +3,9 @@
  * 主要操作数据库语句
  */
 var sqlMap = {
-    user: {
-        add: 'insert into user(id,user,psd) values (0,?,?)'
-    }
+  user: {
+    insert: 'insert into user(user,psd) values (?,?)',
+    getUser: 'select * from user where user = ? and psd = ?'
+  }
 }
 module.exports = sqlMap
