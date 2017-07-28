@@ -68,8 +68,28 @@
             }
           })
       },
-      logIn: function () {
-
+      logIn: function (event) {
+        if (this.login.user === '' || this.login.psd === '') {
+          this.$message({
+            message: '账号不能为空',
+            type: 'error'
+          })
+          return
+        }
+        const postData = {
+          user: this.login.user,
+          psd: this.login.psd
+        }
+        this.axios.post('/user/login', postData)
+          .then(response => {
+            console.log(response)
+            var result = response.data.result
+            if (result) {
+              alert('登录成功')
+            } else {
+              alert('登录失败')
+            }
+          })
       }
     }
   }

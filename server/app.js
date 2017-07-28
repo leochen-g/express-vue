@@ -1,3 +1,4 @@
+// 引入依赖
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -5,7 +6,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var index = require('./routes/index');
-var users = require('./routes/users');
 
 var app = express();
 
@@ -17,22 +17,22 @@ app.all('*', function(req, res, next) {
   res.header("Content-Type", "application/json;charset=utf-8");
   next();
 });
-// view engine setup
+// view engine setup 视图引擎目录设置
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// 配置中间件
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+//引用路由
 app.use('/api', index);
-app.use('/users', users);
 
-// catch 404 and forward to error handler
+// catch 404 and forward to error handler 处理404错误 并向下传递错误
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
@@ -41,7 +41,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  // set locals, only providing error in development 只在开发模式下暴露错误信息
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
