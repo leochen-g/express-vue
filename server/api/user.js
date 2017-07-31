@@ -1,6 +1,6 @@
 /**
  * Created by geng on 2017/7/26.
- * Api数据接口
+ * Api数据接口 本目录暂未启用
  */
 var express = require('express');
 var router = express.Router();
