@@ -54,10 +54,7 @@
           })
           return
         }
-        const postData = {
-          user: this.login.user,
-          psd: this.login.psd
-        }
+        const postData = [this.login.user, this.login.psd]
         this.axios.post('/user/resign', postData)
           .then(response => {
             var result = response.data.result

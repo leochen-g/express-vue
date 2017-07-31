@@ -12,7 +12,7 @@ var sqlMap = require('../sqlMap/userSqlMap')
 var errMessage = '../config/errMessage'
 // 创建连接池，提高性能
 var pool = mysql.createPool(db)
-
+// json格式化
 var jsonWrite = function (res, ret) {
   if (typeof ret === 'undefined') {
     res.json({
@@ -25,63 +25,33 @@ var jsonWrite = function (res, ret) {
 }
 
 module.exports = {
-  query: function (sql, data, callback) {
-    pool.getConnection(function (err, connection) {
-      connection.query(sql, data, function (err, rows) {
-        callback(err, rows)
-        connection.release()
-      })
-    })
-  },
-  // 用户注册控制单元
-  insertUser: function (param, callback) {
-    // 判断是否传参
-    if (!param.user) callback({result: false, msg: '获取数据失败，请稍后重试'})
-    // 首先判断数据库中是否存在相同用户名
-    pool.query(sqlMap.user.getUser, [param.user, param.psd], function (err, result) {
-      if (err) {
-        return errMessage.showErr(err)
-      } else {
-        if (result.length === 0) {
-          // 注册用户
-          pool.query(sqlMap.user.insert, [param.user, param.psd], function (err, result) {
-            if (err) {
-              throw err
-            } else {
-              callback({result: true, msg: '注册成功'})
-            }
-          })
-        } else {
-          callback({result: false, msg: '注册失败'})
-        }
-      }
-    })
-  },
   // 用户注册单元
   userResign: function (req, res, next) {
     pool.getConnection(function (err, connection) {
       var param = req.body
-      if (!param.body.user || !param.body.psd) {
-        res.json({
-          result: false,
-          msg: '获取数据失败,请稍后重试'
-        })
+      if (!param) {
+        res.json({result: false, msg: errMessage.errMsg.noData})
       } else {
-        connection.query(sqlMap.user.getUser, [param.user, param.psd], function (err, result) {
+        // 判断数据库中是否存在重复名
+        connection.query(sqlMap.user.getUser, param, function (err, result) {
           if (err) {
-            return errMessage.showErr(err)
+            return res.json({result: false, msg: errMessage.errMsg.noData})
           } else {
             if (result.length === 0) {
-              // 注册用户
-              pool.query(sqlMap.user.insert, [param.user, param.psd], function (err, result) {
+              // 数据库不存在重复用户，注册用户
+              pool.query(sqlMap.user.insert, param, function (err, result) {
                 if (err) {
-                  throw err
+                  return res.json({result: false, msg: errMessage.errMsg.noData})
                 } else {
-                  callback({result: true, msg: '注册成功'})
+                  result = {result: true, msg: '注册成功'}
+                  jsonWrite(res, result)
+                  connection.release()
                 }
               })
             } else {
-              callback({result: false, msg: '注册失败'})
+              result = {result: false, msg: '注册失败，用户名重复'}
+              jsonWrite(res, result)
+              connection.release()
             }
           }
         })

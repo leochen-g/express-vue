@@ -5,7 +5,7 @@
 var sqlMap = {
   user: {
     insert: 'insert into user(user,psd) values (?,?)',
-    getUser: 'select * from user where user = ? and psd = ?'
+    getUser: 'select * from user where user =? and psd =?'
   }
 }
 module.exports = sqlMap
